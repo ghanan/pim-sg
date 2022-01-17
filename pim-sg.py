@@ -17,6 +17,15 @@ if uname().node == 'pc1':
     LISCLAWID=30
     LISLETWID=6
     NOSCROLL = True
+elif uname().node == 'patc':
+    DIR = '/home/atc/PIM'
+    A1 = 'Arial 14'
+    A2 = 'Courier 16'
+    POSICION = (730,130)
+    TAMANO = (380,540)
+    LISCLAWID=30
+    LISLETWID=6
+    NOSCROLL = True
 else:
     DIR = '/storage/emulated/0/PIM'
     A1 = 'Arial 12'
