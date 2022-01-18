@@ -46,8 +46,42 @@ class FICHERO:
     def get_claves(self) -> list:
         return self.claves()
 
-    def busca_registros(self, item='', en_memo=True, ignora_tilde=False, log_y=True, claves='') -> list:
-        pass
+    def destilde(self, cad):
+        return cad #p
+
+    def segun_tilde(self, reg, ignora_tilde):
+        if ignora_tilde: return destilde(self, reg)
+        return reg
+
+    def claves_en_registro(self, _claves: str, claves_reg: list):
+        claves = _claves.split('~')
+        for cla in claves:
+            if cla not in claves_reg: return False
+        return True
+
+    def busca_registros(self, cad='', solo_titulo=False, ignora_tilde=False, logic_y=True, claves='') -> list:
+        # ~ print(cad)
+        # ~ print(solo_titulo)
+        # ~ print(ignora_tilde)
+        # ~ print(log_y)
+        # ~ print(claves)
+        if not self.cargado: self.carga()
+        cadena = cad.lower()
+        if not ignora_tilde: cadena = self.destilde(cadena)
+        while ('  ' in cadena): cadena.replace('  ', ' ')
+        claves_bus = claves.split(',')
+        lis = []
+        for i in range(len(self.registros)):
+            reg = self.segun_tilde(self.registros[i].lower(), ignora_tilde)
+            if solo_titulo:
+                if cadena not in reg.split('~')[0]: continue
+            else:
+                if cadena not in reg: continue
+            if claves and logic_y:
+                if not self.claves_en_registro(claves, self.registros[i].split('~')[2:]):
+                    continue
+            lis.append(i)
+        return sorted([(self.registros[i], i) for i in lis])
 
     def busca_reg_x_claves(self, claves='') -> list:
         claves_bus = claves.split(',')
