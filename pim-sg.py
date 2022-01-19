@@ -116,8 +116,68 @@ def elige_claves(F, claves_pre: str) -> str:
         elif event in (None, 'Cancelar'): return claves_pre
         else: return ','.join(values['-claves-'])  # Aceptar
 
+def editar(F, modo, _item='', _memo='', _claves='', num=None):
+    item = _item
+    memo = _memo
+    claves = _claves
+    while True:
+        layout = [
+            [sg.B(button_text='Sustituir', auto_size_button='no', expand_x=True),
+             sg.B(button_text='Cancelar',auto_size_button='no', expand_x=True),
+             sg.B(button_text='Añadir', auto_size_button='no', expand_x=True)],
+            [sg.InputText(item, key='item', expand_x=True, focus=True)],
+            [sg.Multiline(memo, key='memo', expand_x=True, expand_y=True, rstrip=True)],
+            [sg.Text(claves, key='claves', enable_events=True, justification='center', text_color='#000000', background_color='#ffff55', expand_x=True)],
+            [sg.B(button_text='Limpiar\nTítulo',auto_size_button='no', expand_x=True),
+             sg.B(button_text='Limpiar\nTexto', auto_size_button='no', expand_x=True),
+             sg.B(button_text='Limpiar\nClaves', auto_size_button='no', expand_x=True)],
+            [sg.B(button_text='Salir', auto_size_button='no', expand_x=True)],
+        ]
+        window = sg.Window('PIM', layout, location=POSICION, size=TAMANO)
+        while True:
+            event, values = window.read()
+            if event == 'Cancelar':
+                window.close()
+                return
+            if event in (sg.WIN_CLOSED, None, 'Salir'): exit()
+            if event == 'Limpiar\nTítulo':
+                window.Element('item').update('')
+                continue
+            if event == 'Limpiar\nTexto':
+                window.Element('memo').update('')
+                continue
+            if event == 'Limpiar\nClaves':
+                claves = ''
+                window.Element('claves').update('')
+                continue
+            if event == 'claves':
+                item = values['item']
+                memo = values['memo']
+                window.close()
+                claves = elige_claves(F, claves)
+                break
+            if event == 'Añadir':
+                if not values['item']:
+                    sg.popup('Título del item en blanco', title='PIM')
+                    continue
+                window.close()
+                F.anadir(values['item'] + '~' + \
+                         values['memo'].replace('\n',' ^ ') + '~' + \
+                         claves.replace(',','~'))
+                return
+            if event == 'Sustituir':
+                if modo == 'alta':
+                    sg.popup('Se trata de un ALTA', title='PIM', keep_on_top=True)
+                    continue
+                    if not values['item']:
+                        sg.popup('Título del item en blanco', title='PIM', keep_on_top=True)
+                        continue
+                if F.sustituir(num, values['item'] + '~' + \
+                                 values['memo'].replace('\n',' ^ ') + '~' + \
+                                 claves.replace(',','~')):
+                    return
+
 def elige_registro(lista = []) -> tuple:
-    print(lista)
     lis = [l[0].split('~')[0] for l in lista]
     layout = [
         [sg.Text('ELIGE REGISTRO', justification='center', expand_x=True)],
@@ -127,13 +187,12 @@ def elige_registro(lista = []) -> tuple:
     ]
     window = sg.Window('PIM', layout, location=POSICION, size=TAMANO)
     event, values = window.read(close=True)
-    # ~ if event == 'Cancelar': return 0
     if event == 'Cancelar': return (None, None)
-    if event in (None, 'Salir'): exit() # None si cierra ventana
+    if event in (None, sg.WIN_CLOSED, 'Salir'): exit() # None si cierra ventana
     # ~ return lista[lis.index(values[0][0])][1] + 1 # el 0 es Cancelar
     return lista[lis.index(values[0][0])]
 
-def muestra_registro(reg='', num=None):
+def muestra_registro(F, reg='', num=None):
     if not reg:
         item = memo = claves = ''
     else:
@@ -155,6 +214,8 @@ def muestra_registro(reg='', num=None):
     ]
     window = sg.Window('PIM', layout, location=POSICION, size=TAMANO)
     event, values = window.read(close=True)
+    if event == 'Modificar': editar(F, 'modif', item, memo, claves, num)
+    elif event in (None, sg.WIN_CLOSED, 'Salir'): exit() # None si cierra ventana
 
 def buscar(F):
     item = claves = '' # 'clave1,clave2'
@@ -201,63 +262,14 @@ def buscar(F):
             if event == 'Buscar':
                 window.close()
                 if values['-item-'].strip(' ') != '':
-                    hits = F.busca_registros(cad=values['-item-'],
+                    reg, num_reg = elige_registro(F.busca_registros(cad=values['-item-'],
                             solo_titulo=values['-cont-'], ignora_tilde=values['-tilde-'],
-                            logic_y=values['-y-'], claves=claves)
-                    print(hits)
+                            logic_y=values['-y-'], claves=claves))
                 else:
                     # ~ num_reg = elige_registro(F.busca_reg_x_claves(claves))
                     reg, num_reg = elige_registro(F.busca_reg_x_claves(claves))
-                    if num_reg: muestra_registro(reg, num_reg)
-                    else: break
-
-def editar(F, modo, _item='', _memo='', _claves=''):
-    item = _item
-    memo = _memo
-    claves = _claves
-    while True:
-        layout = [
-            [sg.B(button_text='Sustituir', auto_size_button='no', expand_x=True),
-             sg.B(button_text='Cancelar',auto_size_button='no', expand_x=True),
-             sg.B(button_text='Añadir', auto_size_button='no', expand_x=True)],
-            [sg.InputText(item, key='item', expand_x=True, focus=True)],
-            [sg.Multiline(memo, key='memo', expand_x=True, expand_y=True, rstrip=True)],
-            [sg.Text(claves, key='claves', enable_events=True, justification='center', text_color='#000000', background_color='#ffff55', expand_x=True)],
-            [sg.B(button_text='Limpiar\nTítulo',auto_size_button='no', expand_x=True),
-             sg.B(button_text='Limpiar\nTexto', auto_size_button='no', expand_x=True),
-             sg.B(button_text='Limpiar\nClaves', auto_size_button='no', expand_x=True)],
-            [sg.B(button_text='Salir', auto_size_button='no', expand_x=True)],
-        ]
-        window = sg.Window('PIM', layout, location=POSICION, size=TAMANO)
-        while True:
-            event, values = window.read()
-            if event == 'Cancelar':
-                window.close()
-                return
-            if event in (sg.WIN_CLOSED, None, 'Salir'): exit()
-            if event == 'Limpiar\nTítulo':
-                window.Element('item').update('')
-                continue
-            if event == 'Limpiar\nTexto':
-                window.Element('memo').update('')
-                continue
-            if event == 'Limpiar\nClaves':
-                claves = ''
-                window.Element('claves').update('')
-            if event == 'claves':
-                item = values['item']
-                memo = values['memo']
-                window.close()
-                claves = elige_claves(F, claves)
-                break
-            if event == 'Añadir':
-                window.close()
-                F.anadir(values['item'] + '~' + \
-                         values['memo'].replace('\n',' ^ ') + '~' + \
-                         claves.replace(',','~'))
-                return
-
-
+                if num_reg: muestra_registro(F, reg, num_reg)
+                else: break
 
 def main():
     F = m.FICHERO(DIR, fichero_inicial())

@@ -96,3 +96,7 @@ class FICHERO:
             if hit: lis.append(i)
         return sorted([(self.registros[i], i) for i in lis])
 
+    def sustituir(self, num, reg=''):
+        print('ok')
+        return True
+
