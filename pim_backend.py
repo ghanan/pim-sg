@@ -19,12 +19,20 @@ class FICHERO:
         self.registros = []
         # ~ self.carga()
 
+    def graba(self):
+        self.registros.sort()
+        try:
+            with open(self.direc+'/'+self.nombre+'-PIM.csv','w') as fich:
+                for reg in self.registros:
+                    fich.write(reg + '\n')
+            return True
+        except:
+            return False
+
     def anadir(self, reg):
         if not self.cargado: self.carga()
         self.registros.append(reg)
-        with open(self.direc+'/'+self.nombre+'-PIM.csv','w') as fich:
-            for reg in sorted(self.registros):
-                fich.write(reg + '\n')
+        return self.graba()
 
     def carga(self):
         # ~ print([l.rstrip('\n') for l in open(self.direc+'/'+self.nombre+'-PIM.csv').read().splitlines()])
@@ -97,6 +105,6 @@ class FICHERO:
         return sorted([(self.registros[i], i) for i in lis])
 
     def sustituir(self, num, reg=''):
-        print('ok')
-        return True
+        self.registros[num] = reg
+        return self.graba()
 

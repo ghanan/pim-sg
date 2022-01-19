@@ -158,7 +158,7 @@ def editar(F, modo, _item='', _memo='', _claves='', num=None):
                 break
             if event == 'Añadir':
                 if not values['item']:
-                    sg.popup('Título del item en blanco', title='PIM')
+                    sg.popup('Título del item en blanco', title='PIM', keep_on_top=True)
                     continue
                 window.close()
                 F.anadir(values['item'] + '~' + \
@@ -173,8 +173,8 @@ def editar(F, modo, _item='', _memo='', _claves='', num=None):
                         sg.popup('Título del item en blanco', title='PIM', keep_on_top=True)
                         continue
                 if F.sustituir(num, values['item'] + '~' + \
-                                 values['memo'].replace('\n',' ^ ') + '~' + \
-                                 claves.replace(',','~')):
+                               values['memo'].replace('\n',' ^ ') + '~' + \
+                               claves.replace(',','~')):
                     return
 
 def elige_registro(lista = []) -> tuple:
@@ -266,10 +266,9 @@ def buscar(F):
                             solo_titulo=values['-cont-'], ignora_tilde=values['-tilde-'],
                             logic_y=values['-y-'], claves=claves))
                 else:
-                    # ~ num_reg = elige_registro(F.busca_reg_x_claves(claves))
                     reg, num_reg = elige_registro(F.busca_reg_x_claves(claves))
                 if num_reg: muestra_registro(F, reg, num_reg)
-                else: break
+                break
 
 def main():
     F = m.FICHERO(DIR, fichero_inicial())
@@ -287,3 +286,6 @@ def main():
 if __name__ == '__main__':
     main()
 
+'''
+al buscar solo por titulo busca todo
+'''
