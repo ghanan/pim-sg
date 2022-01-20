@@ -31,8 +31,9 @@ else:
     A1 = 'Arial 12'
     A2 = 'Courier 16'
     POSICION = (0,0)
-    TAMANO=(980,1988)
-    LISCLAWID=25
+    #TAMANO=(980,1988)
+    TAMANO=(998,2088)
+    LISCLAWID=21
     LISLETWID=4
     NOSCROLL = False
 
@@ -112,6 +113,7 @@ def elige_claves(F, claves_pre: str) -> str:
         window.close()
         if event == 'Seleccionadas': claves_lis = marcadas
         elif event == 'Todas': claves_lis = claves
+        elif event == 'letra': claves_lis =marcadas+[cla for cla in claves if cla.lower().startswith(values['letra'][0])]
         elif event == 'Nueva':
             if (nueva_clave := sg.popup_get_text('Clave nueva', title='PIM', size=20, keep_on_top=True)):
                 claves_lis.append(nueva_clave)
