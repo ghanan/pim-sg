@@ -112,6 +112,12 @@ def elige_claves(F, claves_pre: str) -> str:
         window.close()
         if event == 'Seleccionadas': claves_lis = marcadas
         elif event == 'Todas': claves_lis = claves
+        elif event == 'Nueva':
+            if (nueva_clave := sg.popup_get_text('Clave nueva', title='PIM', size=20, keep_on_top=True)):
+                claves_lis.append(nueva_clave)
+                claves_lis.sort()
+                marcadas.append(nueva_clave)
+                marcadas.sort()
         elif event in (sg.WIN_CLOSED, 'Salir'): exit()
         elif event in (None, 'Cancelar'): return claves_pre
         else: return ','.join(values['-claves-'])  # Aceptar
