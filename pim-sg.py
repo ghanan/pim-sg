@@ -231,7 +231,7 @@ def buscar(F):
             # ~ [sg.InputText(focus=True), sg.Button(button_text='Alta',auto_size_button='yes')],
             [sg.Button(button_text='Borrar',auto_size_button='yes'), sg.InputText(item, key='-item-', font=A1, focus=True)],
             [sg.Checkbox('Buscar solo en título', key='-cont-', default=False)],
-            [sg.Checkbox('Ignorar acentos, ñ y ç', key='-tilde-', default=False)],
+            [sg.Checkbox('Ignorar acentos, ñ y ç', key='-tilde-', default=True)],
             [sg.B(button_text='Elige claves',auto_size_button='no'), sg.B(button_text='Borrar claves',auto_size_button='no')],
             [sg.Text(claves, key='-claves-', font=A1, enable_events=True, justification='center', text_color='#000000', background_color='#ffff55', expand_x=True)],
             [sg.Text('Tipo de coincidencia', expand_x=True)],
@@ -293,5 +293,5 @@ if __name__ == '__main__':
     main()
 
 '''
-al buscar solo por titulo busca todo
+
 '''

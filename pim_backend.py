@@ -54,11 +54,16 @@ class FICHERO:
     def get_claves(self) -> list:
         return self.claves()
 
-    def destilde(self, cad):
-        return cad #p
+    def destilde(self, _cad):
+        # ~ print(_cad)
+        cad = _cad.replace('á','a').replace('é','e').replace('í','i').replace('ó','o').replace('ú','u')
+        cad =  cad.replace('ñ','n').replace('ç','c').replace('ü','u').replace('º','o').replace('ª','a')
+        cad =  cad.replace('¿','?').replace('¡','!')
+        # ~ print(cad)
+        return cad
 
     def segun_tilde(self, reg, ignora_tilde):
-        if ignora_tilde: return destilde(self, reg)
+        if ignora_tilde: return self.destilde(reg)
         return reg
 
     def claves_en_registro(self, _claves: str, claves_reg: list):
@@ -75,7 +80,7 @@ class FICHERO:
         # ~ print(claves)
         if not self.cargado: self.carga()
         cadena = cad.lower()
-        if not ignora_tilde: cadena = self.destilde(cadena)
+        if ignora_tilde: cadena = self.destilde(cadena)
         while ('  ' in cadena): cadena.replace('  ', ' ')
         claves_bus = claves.split(',')
         lis = []
@@ -84,6 +89,8 @@ class FICHERO:
             if solo_titulo:
                 if cadena not in reg.split('~')[0]: continue
             else:
+                print(cadena)
+                print(reg)
                 if cadena not in reg: continue
             if claves and logic_y:
                 if not self.claves_en_registro(claves, self.registros[i].split('~')[2:]):
