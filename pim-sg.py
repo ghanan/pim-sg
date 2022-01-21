@@ -183,7 +183,7 @@ def editar(F, modo, _item='', _memo='', _claves='', num=None):
                 if F.sustituir(num, values['item'] + '~' + \
                                values['memo'].replace('\n',' ^ ') + '~' + \
                                claves.replace(',','~')):
-                    return
+                    return (values['item'], values['memo'], claves)
 
 def elige_registro(lista = []) -> tuple:
     lis = [l[0].split('~')[0] for l in lista]
