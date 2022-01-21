@@ -115,3 +115,6 @@ class FICHERO:
         self.registros[num] = reg
         return self.graba()
 
+    def eliminar(self, num):
+        if reg := self.registros.pop(num):
+            if self.graba(): return reg

@@ -222,9 +222,13 @@ def muestra_registro(F, reg='', num=None):
     ]
     window = sg.Window('PIM', layout, location=POSICION, size=TAMANO)
     event, values = window.read(close=True)
-    if event == 'Modificar': editar(F, 'modif', item, memo, claves, num)
-    elif event in (None, sg.WIN_CLOSED, 'Salir'): exit() # None si cierra ventana
-
+    if event in (None, sg.WIN_CLOSED, 'Salir'): exit() # None si cierra ventana
+    if event == 'Borrar': 
+        if 'OK' == sg.popup_ok_cancel('¿Eliminar?', title='PIM', keep_on_top='True'):
+            sg.popup('Borrado:',F.eliminar(num).split('~')[0], title='PIM', keep_on_top=True)
+            return
+   if event == 'Modificar': editar(F, 'modif', item, memo, claves, num)
+ 
 def buscar(F):
     item = claves = '' # 'clave1,clave2'
     while True:
