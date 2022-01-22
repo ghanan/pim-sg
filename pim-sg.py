@@ -183,7 +183,7 @@ def editar(F, modo, _item='', _memo='', _claves='', num=None):
                 if F.sustituir(num, values['item'] + '~' + \
                                values['memo'].replace('\n',' ^ ') + '~' + \
                                claves.replace(',','~')):
-                    return (values['item'], values['memo'], claves)
+                    return '~'.join([values['item'], values['memo'], claves.replace(',','~')])
 
 def elige_registro(lista = []) -> tuple:
     lis = [l[0].split('~')[0] for l in lista]
@@ -230,8 +230,7 @@ def muestra_registro(F, reg='', num=None):
     if event == 'Modificar':
         window.close()
         if  res:= editar(F, 'modif', item, memo, claves, num):
-            sg.popup(res)
-            #muestra_registro(F)
+            muestra_registro(F, res, num)
 
 def buscar(F):
     item = claves = '' # 'clave1,clave2'
