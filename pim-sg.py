@@ -229,7 +229,9 @@ def muestra_registro(F, reg='', num=None):
             return
     if event == 'Modificar':
         window.close()
-        editar(F, 'modif', item, memo, claves, num)
+        if  res:= editar(F, 'modif', item, memo, claves, num):
+            sg.popup(res)
+            #muestra_registro(F)
 
 def buscar(F):
     item = claves = '' # 'clave1,clave2'
