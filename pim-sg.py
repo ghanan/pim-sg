@@ -110,7 +110,7 @@ def elige_claves(F, claves_pre: str) -> str:
             marcadas = values['-claves-']
             if event == '-claves-': continue
             else: break
-        window.close()
+        window.close(); del window
         if event == 'Seleccionadas': claves_lis = marcadas
         elif event == 'Todas': claves_lis = claves
         elif event == 'letra': claves_lis =marcadas+[cla for cla in claves if cla.lower().startswith(values['letra'][0])]
@@ -145,7 +145,7 @@ def editar(F, modo, _item='', _memo='', _claves='', num=None):
         while True:
             event, values = window.read()
             if event == 'Cancelar':
-                window.close()
+                window.close(); del window
                 return
             if event in (sg.WIN_CLOSED, None, 'Salir'): exit()
             if event == 'Limpiar\nTítulo':
@@ -161,14 +161,14 @@ def editar(F, modo, _item='', _memo='', _claves='', num=None):
             if event == 'claves':
                 item = values['item']
                 memo = values['memo']
-                window.close()
+                window.close(); del window
                 claves = elige_claves(F, claves)
                 break
             if event == 'Añadir':
                 if not values['item']:
                     sg.popup('Título del item en blanco', title='PIM', keep_on_top=True)
                     continue
-                window.close()
+                window.close(); del window
                 F.anadir(values['item'] + '~' + \
                          values['memo'].replace('\n',' ^ ') + '~' + \
                          claves.replace(',','~'))
@@ -183,7 +183,7 @@ def editar(F, modo, _item='', _memo='', _claves='', num=None):
                 if F.sustituir(num, values['item'] + '~' + \
                                values['memo'].replace('\n',' ^ ') + '~' + \
                                claves.replace(',','~')):
-                    return '~'.join([values['item'], values['memo'], claves.replace(',','~')])
+                    return (values['item'], values['memo'], claves)
 
 def elige_registro(lista = []) -> tuple:
     lis = [l[0].split('~')[0] for l in lista]
@@ -228,34 +228,47 @@ def muestra_registro(F, reg='', num=None):
             sg.popup('Borrado:',F.eliminar(num).split('~')[0], title='PIM', keep_on_top=True)
             return
     if event == 'Modificar':
-        window.close()
+        window.close(); del window
         if  res:= editar(F, 'modif', item, memo, claves, num):
-            muestra_registro(F, res, num)
+            sg.popup(res)
+            #muestra_registro(F)
 
 def buscar(F):
     item = claves = '' # 'clave1,clave2'
     while True:
-        layout = [
-            [sg.Text('Buscando en ' + F.nombre, justification='center', expand_x=True)],
-            # ~ [sg.InputText(focus=True), sg.Button(button_text='Alta',auto_size_button='yes')],
-            [sg.Button(button_text='Borrar',auto_size_button='yes'), sg.InputText(item, key='-item-', font=A1, focus=True)],
+        layout_opc = [
             [sg.Checkbox('Buscar solo en título', key='-cont-', default=False)],
             [sg.Checkbox('Ignorar acentos, ñ y ç', key='-tilde-', default=True)],
-            [sg.B(button_text='Elige claves',auto_size_button='no'), sg.B(button_text='Borrar claves',auto_size_button='no')],
+        ]
+        layout = [
+            [sg.Text('Buscando en ' + F.nombre, justification='center', expand_x=True)],
+            [sg.Text(' ')],
+            # ~ [sg.InputText(focus=True), sg.Button(button_text='Alta',auto_size_button='yes')],
+            [sg.Button(button_text='Borrar',auto_size_button='yes'), sg.InputText(item, key='-item-', font=A1, focus=True)],
+            [sg.Text(' ')],
+            [sg.Frame('Opciones de busqueda', layout_opc, title_color='blue', border_width=10, expand_x = True)],
+            [sg.Text(' ')],
+            [sg.B(button_text='Elige claves',auto_size_button='no'), sg.B(button_text='Borrar claves',auto_size_button='no', expand_x=True)],
             [sg.Text(claves, key='-claves-', font=A1, enable_events=True, justification='center', text_color='#000000', background_color='#ffff55', expand_x=True)],
-            [sg.Text('Tipo de coincidencia', expand_x=True)],
-            [sg.Radio('Texto <Y> Claves', "RADIO1", key='-y-', default=True)],
-            [sg.Radio('Texto <O> Claves', "RADIO1")],
+            #[sg.Text('Tipo de coincidencia', expand_x=True)],
+            [sg.Text(' ')],
+            [sg.Frame('Tipo de coincidencia', [
+                    [sg.Radio('Texto <Y> Claves', "RADIO1", key='-y-', default=True)],
+                    [sg.Radio('Texto <O> Claves', "RADIO1")],
+                ], title_color='blue', border_width=10, expand_x = True)
+            ],
+            [sg.Text(' ')],
             [sg.B(button_text='Menu', auto_size_button='no',expand_x=True, expand_y=True),
-             sg.B(button_text='Limpiar', auto_size_button='no', expand_x=True, expand_y=True),
-             sg.B(button_text='Buscar', auto_size_button='no', expand_x=True, expand_y=True)],
-            [sg.B(button_text='Salir', auto_size_button='no',expand_x=True)],
+             sg.B(button_text='Limpiar', expand_x=True, expand_y=True),
+             sg.B(button_text='Buscar', expand_x=True, expand_y=True)],
+            [sg.Text(' ')],
+            [sg.B(button_text='Salir', expand_x=True)],
         ]
         window = sg.Window('PIM', layout, location=POSICION, size=TAMANO)
         while True:
             event, values = window.read()
             if event == 'Menu':
-                window.close()
+                window.close(); del window
                 return
             if event in (sg.WIN_CLOSED, None, 'Salir'): exit()
             if event == 'Borrar':
@@ -263,7 +276,7 @@ def buscar(F):
                 continue
             if event in ('Elige claves', '-claves-'):
                 item = values['-item-']
-                window.close()
+                window.close(); del window
                 claves = elige_claves(F, claves)
                 break
             if event == 'Borrar claves':
@@ -275,7 +288,7 @@ def buscar(F):
                 claves = ''
                 window.Element('-claves-').update('')
             if event == 'Buscar':
-                window.close()
+                window.close(); del window
                 if values['-item-'].strip(' ') != '':
                     reg, num_reg = elige_registro(F.busca_registros(cad=values['-item-'],
                             solo_titulo=values['-cont-'], ignora_tilde=values['-tilde-'],
