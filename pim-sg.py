@@ -180,10 +180,11 @@ def editar(F, modo, _item='', _memo='', _claves='', num=None):
                     if not values['item']:
                         sg.popup('Título del item en blanco', title='PIM', keep_on_top=True)
                         continue
-                if F.sustituir(num, values['item'] + '~' + \
-                               values['memo'].replace('\n',' ^ ') + '~' + \
-                               claves.replace(',','~')):
-                    return (values['item'], values['memo'], claves)
+                window.close()
+                reg = values['item'] + '~' + \
+                      values['memo'].replace('\n',' ^ ') + '~' + \
+                      claves.replace(',','~')
+                if F.sustituir(num, reg): return (F, reg, num)
 
 def elige_registro(lista = []) -> tuple:
     lis = [l[0].split('~')[0] for l in lista]
@@ -229,9 +230,9 @@ def muestra_registro(F, reg='', num=None):
             return
     if event == 'Modificar':
         window.close(); del window
-        if  res:= editar(F, 'modif', item, memo, claves, num):
-            sg.popup(res)
-            #muestra_registro(F)
+        if  res := editar(F, 'modif', item, memo, claves, num):
+            # ~ sg.popup(res)
+            muestra_registro(res[0], res[1], res[2])
 
 def buscar(F):
     item = claves = '' # 'clave1,clave2'
