@@ -231,10 +231,6 @@ def muestra_registro(F, reg='', num=None):
     if event == 'Modificar':
         window.close(); del window
         if  res := editar(F, 'modif', item, memo, claves, num):
-<<<<<<< HEAD
-            # ~ sg.popup(res)
-=======
->>>>>>> 1095d8b (Muestra el registro modificado tras grabarlo)
             muestra_registro(res[0], res[1], res[2])
 
 def buscar(F):
