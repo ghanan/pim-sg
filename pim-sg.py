@@ -54,7 +54,7 @@ def elige_fichero() -> str:
         exit()
     layout = [
         [sg.Text('ELIGE FICHERO', justification='center', expand_x=True)],
-        [sg.Listbox(values=ficheros, expand_x=True, expand_y=True, enable_events=True)]
+        [sg.Listbox(values=ficheros, expand_x=True, expand_y=True, font=A1,  enable_events=True)]
     ]
     window = sg.Window('PIM', layout, location=POSICION, size=TAMANO)
     event, values = window.read(close=True)
