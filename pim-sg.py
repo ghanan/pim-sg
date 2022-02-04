@@ -12,6 +12,7 @@ if uname().node == 'pc1':
     DIR = '/home/atc/PIM'
     A1 = 'Arial 14'
     A2 = 'Courier 16'
+    B1 = 'Arial 16'
     POSICION = (700,300)
     TAMANO = (380,540)
     LISCLAWID=30
@@ -21,6 +22,7 @@ elif uname().node == 'patc':
     DIR = '/home/atc/PIM'
     A1 = 'Arial 14'
     A2 = 'Courier 16'
+    B1 = 'Arial 16'
     POSICION = (730,130)
     TAMANO = (380,540)
     LISCLAWID=30
@@ -30,6 +32,7 @@ else:
     DIR = '/storage/emulated/0/PIM'
     A1 = 'Arial 12'
     A2 = 'Courier 16'
+    B1 = 'Arial 16'
     POSICION = (0,0)
     #TAMANO=(980,1988)
     TAMANO=(998,2088)
@@ -73,12 +76,12 @@ def elige_fichero() -> str:
 def menu_a(nombre = ''):
     layout = [
         [sg.Text(nombre, font=A1, justification='center', expand_x=True)],
-        [sg.Button('Alta', auto_size_button='yes', font=A1, expand_x=True, expand_y=True)],
-        [sg.Button('Buscar', auto_size_button='yes', font=A1, expand_x=True, expand_y=True)],
-        [sg.Button('Abrir archivo', auto_size_button='yes', font=A1, expand_x=True, expand_y=True)],
-        [sg.Button('Archivo nuevo', auto_size_button='yes', font=A1, expand_x=True, expand_y=True)],
-        [sg.Button('Utilidades', auto_size_button='yes', font=A1, expand_x=True, expand_y=True)],
-        [sg.Button('Salir', auto_size_button='yes', font=A1, expand_x=True, expand_y=True)],
+        [sg.Button('Alta', auto_size_button='yes', font=B1, expand_x=True, expand_y=True)],
+        [sg.Button('Buscar', auto_size_button='yes', font=B1, expand_x=True, expand_y=True)],
+        [sg.Button('Abrir archivo', auto_size_button='yes', font=B1, expand_x=True, expand_y=True)],
+        [sg.Button('Archivo nuevo', auto_size_button='yes', font=B1, expand_x=True, expand_y=True)],
+        [sg.Button('Utilidades', auto_size_button='yes', font=B1, expand_x=True, expand_y=True)],
+        [sg.Button('Salir', auto_size_button='yes', font=B1, expand_x=True, expand_y=True)],
     ]
     # ~ event, values = sg.Window('PIM', layout, location=POSICION, size=(480, 800)).read()
     window = sg.Window('PIM', layout, location=POSICION, size=TAMANO)
@@ -262,7 +265,7 @@ def buscar(F):
              sg.B(button_text='Limpiar', expand_x=True, expand_y=True),
              sg.B(button_text='Buscar', expand_x=True, expand_y=True)],
             [sg.Text(' ')],
-            [sg.B(button_text='Salir', expand_x=True)],
+            [sg.B(button_text='Salir', font=B1, expand_x=True)],
         ]
         window = sg.Window('PIM', layout, location=POSICION, size=TAMANO)
         while True:
