@@ -190,18 +190,18 @@ def editar(F, modo, _item='', _memo='', _claves='', num=None):
                 if F.sustituir(num, reg): return (F, reg, num)
 
 def elige_registro(lista = []) -> tuple:
+    if len(lista) == 1: return lista[0]
     lis = [l[0].split('~')[0] for l in lista]
     layout = [
         [sg.Text('ELIGE REGISTRO', justification='center', expand_x=True)],
-        [sg.Listbox(values=lis, expand_x=True, expand_y=True, enable_events=True)],
-        [sg.B(button_text='Cancelar',auto_size_button='no', expand_x=True),
+        [sg.Listbox(values=lis, font=A1, expand_x=True, expand_y=True, enable_events=True)],
+        [sg.B(button_text='Volver',auto_size_button='no', expand_x=True),
          sg.B(button_text='Salir', auto_size_button='no',expand_x=True)]
     ]
     window = sg.Window('PIM', layout, location=POSICION, size=TAMANO)
     event, values = window.read(close=True)
-    if event == 'Cancelar': return (None, None)
+    if event == 'Volver': return (None, None)
     if event in (None, sg.WIN_CLOSED, 'Salir'): exit() # None si cierra ventana
-    # ~ return lista[lis.index(values[0][0])][1] + 1 # el 0 es Cancelar
     return lista[lis.index(values[0][0])]
 
 def muestra_registro(F, reg='', num=None):
@@ -264,7 +264,7 @@ def buscar(F):
             [sg.B(button_text='Menu', auto_size_button='no',expand_x=True, expand_y=True),
              sg.B(button_text='Limpiar', expand_x=True, expand_y=True),
              sg.B(button_text='Buscar', expand_x=True, expand_y=True)],
-            [sg.Text(' ')],
+            #[sg.Text(' ')],
             [sg.B(button_text='Salir', font=B1, expand_x=True)],
         ]
         window = sg.Window('PIM', layout, location=POSICION, size=TAMANO)
@@ -292,7 +292,8 @@ def buscar(F):
                 window.Element('-claves-').update('')
             if event == 'Buscar':
                 window.close(); del window
-                if values['-item-'].strip(' ') != '':
+                item = values['-item-']
+                if item.strip(' ') != '':
                     reg, num_reg = elige_registro(F.busca_registros(cad=values['-item-'],
                             solo_titulo=values['-cont-'], ignora_tilde=values['-tilde-'],
                             logic_y=values['-y-'], claves=claves))
@@ -300,6 +301,9 @@ def buscar(F):
                     reg, num_reg = elige_registro(F.busca_reg_x_claves(claves))
                 if num_reg: muestra_registro(F, reg, num_reg)
                 break
+
+def archivo_nuevo(nombre = ''):
+    return None
 
 def main():
     F = m.FICHERO(DIR, fichero_inicial())
@@ -313,6 +317,8 @@ def main():
             open(CFG,'w').write(fichero)
         if   opcion == 'Buscar': buscar(F)
         elif opcion == 'Alta'  : editar(F, 'alta')
+        elif opcion == 'Archivo nuevo'  :
+            if FF := archivo_nuevo(): F = FF
 
 if __name__ == '__main__':
     main()
