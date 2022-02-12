@@ -47,20 +47,25 @@ registros = []
 claves = []
 
 def fichero_inicial() -> str:
-    try: return open(CFG).readlines()[0].rstrip('\n')
-    except: return elige_fichero()
+    try: nombre = open(CFG).readlines()[0].rstrip('\n')
+    except: return elige_fichero() # se ha borrado el PIM.cfg
+    if not nombre[:-8] in [f[:-8] for f in m.ficheros_pim(DIR)]:
+        return elige_fichero()     # se ha borrado el fichero
+    return nombre
 
 def elige_fichero() -> str:
     ficheros = [f[:-8] for f in m.ficheros_pim(DIR)]
     if not ficheros:
-        sg.popup('ERROR', 'No hay ficheros PIM')
+        sg.popup('ERROR', 'No hay ficheros PIM', title='PIM', font=A1)
         exit()
     layout = [
         [sg.Text('ELIGE FICHERO', justification='center', expand_x=True)],
-        [sg.Listbox(values=ficheros, expand_x=True, expand_y=True, font=A1,  enable_events=True)]
+        [sg.Listbox(values=ficheros, expand_x=True, expand_y=True, font=A1, enable_events=True)],
+        [sg.B('Cancelar', font=B1, expand_x=True)],
     ]
     window = sg.Window('PIM', layout, location=POSICION, size=TAMANO)
     event, values = window.read(close=True)
+    if event == 'Cancelar': return
     try: return values[0][0] + '-PIM.csv'
     except: exit()  # si cerro la ventana
 
@@ -118,7 +123,7 @@ def elige_claves(F, claves_pre: str) -> str:
         elif event == 'Todas': claves_lis = claves
         elif event == 'letra': claves_lis =marcadas+[cla for cla in claves if cla.lower().startswith(values['letra'][0])]
         elif event == 'Nueva':
-            if (nueva_clave := sg.popup_get_text('Clave nueva', title='PIM', size=20, keep_on_top=True)):
+            if (nueva_clave := sg.popup_get_text('Clave nueva', title='PIM', size=20, keep_on_top=True, font=A1)):
                 claves_lis.append(nueva_clave)
                 claves_lis.sort()
                 marcadas.append(nueva_clave)
@@ -169,7 +174,7 @@ def editar(F, modo, _item='', _memo='', _claves='', num=None):
                 break
             if event == 'Añadir':
                 if not values['item']:
-                    sg.popup('Título del item en blanco', title='PIM', keep_on_top=True)
+                    sg.popup('Título del item en blanco', title='PIM', font=A1, keep_on_top=True)
                     continue
                 window.close(); del window
                 F.anadir(values['item'] + '~' + \
@@ -178,10 +183,10 @@ def editar(F, modo, _item='', _memo='', _claves='', num=None):
                 return
             if event == 'Sustituir':
                 if modo == 'alta':
-                    sg.popup('Se trata de un ALTA', title='PIM', keep_on_top=True)
+                    sg.popup('Se trata de un ALTA', title='PIM', font=A1, keep_on_top=True)
                     continue
                     if not values['item']:
-                        sg.popup('Título del item en blanco', title='PIM', keep_on_top=True)
+                        sg.popup('Título del item en blanco', title='PIM', font=A1, keep_on_top=True)
                         continue
                 window.close()
                 reg = values['item'] + '~' + \
@@ -228,8 +233,8 @@ def muestra_registro(F, reg='', num=None):
     event, values = window.read(close=False)
     if event in (None, sg.WIN_CLOSED, 'Salir'): exit() # None si cierra ventana
     if event == 'Borrar':
-        if 'OK' == sg.popup_ok_cancel('¿Eliminar?', title='PIM', keep_on_top='True'):
-            sg.popup('Borrado:',F.eliminar(num).split('~')[0], title='PIM', keep_on_top=True)
+        if 'OK' == sg.popup_ok_cancel('¿Eliminar?', title='PIM', font=A1, keep_on_top='True'):
+            sg.popup('Borrado:',F.eliminar(num).split('~')[0], title='PIM', font=A1, keep_on_top=True)
             return
     if event == 'Modificar':
         window.close(); del window
@@ -303,22 +308,32 @@ def buscar(F):
                 break
 
 def archivo_nuevo(nombre = ''):
-    return None
+    if nombre := sg.popup_get_text('Nombre del archivo', title='PIM', size=20, font=A1, keep_on_top=True):
+        if nombre in [f[:-8] for f in m.ficheros_pim(DIR)]:
+            sg.popup('ERROR', f'el fichero {nombre} ya existe', title='PIM', font=A1)
+        else:
+            return nombre
 
 def main():
-    F = m.FICHERO(DIR, fichero_inicial())
+    fichero = fichero_inicial()
+    F = m.FICHERO(DIR, fichero)
+    open(CFG,'w').write(fichero)
     while True:
         opcion = menu_a(F.nombre + ' (' + str(F.num_regs) + ')')
         if opcion in ('Salir', None): exit()
-        if opcion == 'Abrir archivo':
-            fichero = elige_fichero()
+        if opcion == 'Abrir archivo' and (fichero := elige_fichero()):
             F = m.FICHERO(DIR, fichero)
-            open('PIM.cfg','w').write(fichero)
+            # ~ open('PIM.cfg','w').write(fichero)
             open(CFG,'w').write(fichero)
         if   opcion == 'Buscar': buscar(F)
         elif opcion == 'Alta'  : editar(F, 'alta')
-        elif opcion == 'Archivo nuevo'  :
-            if FF := archivo_nuevo(): F = FF
+        elif opcion == 'Archivo nuevo' and (nombre := archivo_nuevo()):
+            F = m.FICHERO(DIR, f'{nombre}-PIM.csv')
+            if F.crear():
+                open(CFG,'w').write(f'{nombre}-PIM.csv')
+            else:
+                sg.popup('ERROR', f'Error al crear fichero {nombre}', title='PIM', font=A1)
+                F = m.FICHERO(DIR, fichero_inicial())
 
 if __name__ == '__main__':
     main()

@@ -34,6 +34,11 @@ class FICHERO:
         self.registros.append(reg)
         return self.graba()
 
+    def crear(self):
+        try: open(self.direc+'/'+self.nombre+'-PIM.csv','w')
+        except: return False
+        return True
+
     def carga(self):
         # ~ print([l.rstrip('\n') for l in open(self.direc+'/'+self.nombre+'-PIM.csv').read().splitlines()])
         # ~ print(self.direc+'/'+self.nombre+'-PIM.csv')
